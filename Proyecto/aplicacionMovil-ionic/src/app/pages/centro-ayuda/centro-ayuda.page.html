@@ -1,0 +1,20 @@
+<app-header backButton="/folder/inbox" title="Centro de Ayuda"></app-header>
+
+<ion-content [scrollEvents]="true" (ionScrollStart)="handleScrollStart()" (ionScroll)="handleScroll($any($event))" (ionScrollEnd)="handleScrollEnd()" class="ion-padding">
+    <div id="container-strong">
+  
+      <ion-card>
+        <img src="https://http2.mlstatic.com/D_NQ_NP_925933-MLA75863439939_042024-O.webp" />
+        <ion-card-header>
+          <ion-card-title>Todo para tu huerta</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+    
+      <ion-card>
+        <img src="https://www.casadelriegoecuador.com/wp-content/uploads/2020/10/ASPERSOR-DE-IMPACTO-CON-BRAZO-3D-aspersores-ecuador-casa-del-riego-sistemas-de-riego-ecuador-netafim.jpg" />
+        <ion-card-header>
+          <ion-card-title>Best Seller</ion-card-title>
+        </ion-card-header>
+      </ion-card>
+    </div>
+</ion-content>

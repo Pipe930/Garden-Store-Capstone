@@ -1,0 +1,60 @@
+<ion-app>
+  <ion-split-pane contentId="main-content">
+    <ion-menu contentId="main-content" type="overlay">
+      <ion-content>
+        <ion-list id="inbox-list">
+          <ion-list-header>Menu</ion-list-header>
+          <ion-note></ion-note>
+
+          <ion-menu-toggle auto-hide="false" *ngFor="let p of appPages; let i = index">
+            <ion-item routerDirection="root" [routerLink]="[p.url]" lines="none" detail="false" routerLinkActive="selected">
+              <ion-icon aria-hidden="true" slot="start" [ios]="p.icon + '-outline'" [md]="p.icon + '-sharp'"></ion-icon>
+              <ion-label>{{ p.title }}</ion-label>
+            </ion-item>
+          </ion-menu-toggle>
+        </ion-list>
+
+        <ion-accordion-group expand="inset">
+          <ion-accordion value="first">
+            <ion-item slot="header" color="light">
+              <ion-label>Herramientas</ion-label>
+            </ion-item>
+            <div class="ion-padding" slot="content">Tijeras de Poda</div>
+            <div class="ion-padding" slot="content">Desmalezadores</div>
+            <div class="ion-padding" slot="content">Multiherramientas</div>
+            <div class="ion-padding" slot="content">Podadoras de Altura</div>
+            <div class="ion-padding" slot="content">Herramientas de Cultivo</div>
+            <div class="ion-padding" slot="content">Hachas</div>
+            <div class="ion-padding" slot="content">Machetes</div>
+            <div class="ion-padding" slot="content">Sierras</div>
+            <div class="ion-padding" slot="content">Palas | Barre Hojas</div>
+            <div class="ion-padding" slot="content">Accesorios</div>
+          </ion-accordion>
+          <ion-accordion value="second">
+            <ion-item slot="header" color="light">
+              <ion-label>Riego</ion-label>
+            </ion-item>
+            <div class="ion-padding" slot="content">Aspersores</div>
+            <div class="ion-padding" slot="content">Conectores</div>
+            <div class="ion-padding" slot="content">Pistolas de Riego</div>
+          </ion-accordion>
+          <ion-accordion value="third">
+            <ion-item slot="header" color="light">
+              <ion-label>Semillas</ion-label>
+            </ion-item>
+            <div class="ion-padding" slot="content">Huerto en casa</div>
+            <div class="ion-padding" slot="content">Hortalizas</div>
+            <div class="ion-padding" slot="content">Hierbas</div>
+            <div class="ion-padding" slot="content">Brotes</div>
+            <div class="ion-padding" slot="content">Flores</div>
+            <div class="ion-padding" slot="content">Pasto</div>
+            <div class="ion-padding" slot="content">Accesorios</div>
+          </ion-accordion>
+        </ion-accordion-group>
+        
+
+      </ion-content>
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>
