@@ -10,9 +10,9 @@ export const databaseProviders = [
         useFactory: async (configService: ConfigService) => {
 
             const sequelize = new Sequelize(configService.get<DatabaseConfig>("database"));
-            Logger.log("[+] Conexion Database Successfully");
+            Logger.log("Conexion Database Successfully");
             sequelize.addModels(ArrayModels);
-            Logger.log("[+] Models Create Database Successfully");
+            Logger.log("Models Create Database Successfully");
             await sequelize.sync();
             return sequelize;
         },

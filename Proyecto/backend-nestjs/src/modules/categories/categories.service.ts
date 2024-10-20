@@ -1,4 +1,4 @@
-import { HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpStatus, Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './models/category.model';
@@ -14,17 +14,18 @@ export class CategoriesService {
 
     const category = await Category.findOne<Category>({ where: { name: { [Op.iLike]: name } } });
 
-    if(category) throw new NotFoundException("El nombre de la categoria ya existe");
+    if(category) throw new ConflictException("El nombre de la categoria ya existe");
 
     try {    
-      const newCategory = await Category.create<Category>({ name, slug: "", description });
+      const newCategory = await Category.create<Category>({ name: this.titleCase(name), slug: this.generateSlug(name), description });
       return {
         statusCode: HttpStatus.CREATED,
         message: "Categoria creada correctamente",
         data: newCategory
       };
     } catch (error) {
-      throw new NotFoundException("No se creo la categoria correctamente");
+
+      throw new BadRequestException("No se creo la categoria correctamente");
       
     }
 
@@ -65,12 +66,13 @@ export class CategoriesService {
 
     try {
       
-      category.name = name;
+      category.name = this.titleCase(name);
       category.description = description;
+      category.slug = this.generateSlug(name);
   
       await category.save();
     } catch (error) {
-      throw new NotFoundException("No se actualizo la categoria correctamente");
+      throw new BadRequestException("No se actualizo la categoria correctamente");
     }
 
     return {
@@ -92,5 +94,13 @@ export class CategoriesService {
       statusCode: HttpStatus.NO_CONTENT,
       message: "Categoria eliminada correctamente"
     };
+  }
+
+  private generateSlug(name: string): string {
+    return name.toLowerCase().replace(/ /g, "-");
+  }
+
+  private titleCase(name: string): string {
+    return name.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
   }
 }

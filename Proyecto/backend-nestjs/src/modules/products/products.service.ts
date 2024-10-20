@@ -1,4 +1,4 @@
-import { BadRequestException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './models/product.model';
@@ -8,6 +8,10 @@ import { Op } from 'sequelize';
 import { HttpService } from '@nestjs/axios';
 import { FileUploadDto } from './dto/file-upload.dto';
 import { ImagesProduct } from './models/image.model';
+import { Offer } from '../offers/models/offer.model';
+import { randomUUID } from 'crypto';
+import { SearchProductDto } from './dto/search-product.dto';
+import { PaginateDto } from './dto/paginate.dto';
 
 @Injectable()
 export class ProductsService {
@@ -16,12 +20,14 @@ export class ProductsService {
 
   async create(createProductDto: CreateProductDto):Promise<ResponseData> {
 
-    const { title, brand, returnPolicy, price, description, idCategory } = createProductDto;
+    const { title, brand, returnPolicy, price, description, idCategory, idOffer } = createProductDto;
 
     const product = await Product.findOne<Product>({ where: { title: { [Op.iLike]: title } } });
     const category = await Category.findByPk<Category>(idCategory);
+    const offer = await Offer.findByPk<Offer>(idOffer); 
 
-    if(product) throw new BadRequestException("Ya existe un producto con ese titulo");
+    if(!offer && idOffer) throw new BadRequestException("La oferta ingresada no existe");
+    if(product) throw new ConflictException("Ya existe un producto con ese titulo");
     if(!category) throw new BadRequestException("La categoria ingresada no existe");
 
     try{
@@ -30,10 +36,12 @@ export class ProductsService {
         title,
         brand,
         price,
-        slug: "",
+        priceDiscount: await this.calculateDiscount(price, idOffer),
+        slug: this.generateSlug(title),
         returnPolicy,
         description,
-        idCategory
+        idCategory,
+        idOffer
       });
 
       return {
@@ -42,28 +50,49 @@ export class ProductsService {
         data: newProduct
       }
     } catch (error) {
-
-      throw new BadRequestException("No se guardo el producto correctamente");
+      throw new InternalServerErrorException("No se guardo el producto correctamente");
     }
   }
 
-  async findAll(): Promise<ResponseData> {
+  async findAll(paginateDto: PaginateDto): Promise<ResponseData> {
 
+    let { page, limit } = paginateDto;
+
+    if(!page || !limit){
+      page = 1
+      limit = 20
+    }
+
+    const offset = (page - 1) * limit;
     const products = await Product.findAll<Product>({
       include:[
-
         {
           model: ImagesProduct,
           attributes: ['urlImage', 'type']
+        },
+        {
+          model: Category,
+          attributes: ['idCategory', 'name']
+        },
+        {
+          model: Offer,
+          attributes: ['idOffer', 'title', 'discount']
         }
-      ]
+      ],
+      limit,
+      offset
     });
+
+    const currentPage = page ? +page : 0;
+    const totalPages = Math.ceil(await Product.count() / limit);
 
     if(products.length === 0) return { message: "No tenemos usuarios registrados", statusCode: HttpStatus.NO_CONTENT }
 
     return {
       statusCode: HttpStatus.OK,
-      message: "Lista de productos",
+      count: products.length,
+      currentPage,
+      totalPages,
       data: products
     };
   }
@@ -76,6 +105,14 @@ export class ProductsService {
         {
           model: ImagesProduct,
           attributes: ['urlImage', 'type']
+        },
+        {
+          model: Category,
+          attributes: ['idCategory', 'name']
+        },
+        {
+          model: Offer,
+          attributes: ['idOffer', 'title', 'discount']
         }
       ]
     });
@@ -97,6 +134,14 @@ export class ProductsService {
         {
           model: ImagesProduct,
           attributes: ['urlImage', 'type']
+        },
+        {
+          model: Category,
+          attributes: ['idCategory', 'name']
+        },
+        {
+          model: Offer,
+          attributes: ['idOffer', 'title', 'discount']
         }
       ]
     }
@@ -119,6 +164,14 @@ export class ProductsService {
         {
           model: ImagesProduct,
           attributes: ['urlImage', 'type']
+        },
+        {
+          model: Category,
+          attributes: ['idCategory', 'name']
+        },
+        {
+          model: Offer,
+          attributes: ['idOffer', 'title', 'discount']
         }
       ]
     });
@@ -132,9 +185,46 @@ export class ProductsService {
     }
   }
 
+  async searchProduct(searchProductDto: SearchProductDto): Promise<ResponseData> {
+
+    let { title, category } = searchProductDto;
+
+    if(!title) title = "";
+    if(!category) category = 0;
+
+    const products = await Product.findAll<Product>(
+      { where: { [Op.or]: {
+        title: { [Op.iLike]: `%${title}%` },
+        idCategory: category
+      } },
+      include: [
+        {
+          model: ImagesProduct,
+          attributes: ['urlImage', 'type']
+        },
+        {
+          model: Category,
+          attributes: ['idCategory', 'name']
+        },
+        {
+          model: Offer,
+          attributes: ['idOffer', 'title', 'discount']
+        }
+      ]
+    });
+
+    if(products.length === 0) throw new NotFoundException("No se encontraron productos con ese titulo");
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: "Productos encontrados",
+      data: products
+    }
+  }
+
   async update(id: number, updateProductDto: UpdateProductDto): Promise<ResponseData> {
 
-    const { title, brand, returnPolicy, price, description, idCategory } = updateProductDto;
+    const { title, brand, returnPolicy, price, description, published, idCategory, idOffer } = updateProductDto;
 
     const product = await Product.findByPk<Product>(id);
     const category = await Category.findByPk<Category>(idCategory);
@@ -146,9 +236,13 @@ export class ProductsService {
       product.title = title;
       product.brand = brand;
       product.price = price;
+      product.published = published;
+      product.priceDiscount = await this.calculateDiscount(price, product.idOffer);
+      product.slug = this.generateSlug(title);
       product.returnPolicy = returnPolicy;
       product.description = description;
       product.idCategory = idCategory;
+      product.idOffer = idOffer;
   
       await product.save();
     } catch (error) {
@@ -166,7 +260,7 @@ export class ProductsService {
 
     const product = await Product.findByPk<Product>(id);
 
-    if(!product) throw new NotFoundException("Producto no encontrado");
+    if(!product) throw new NotFoundException("Producto no encontrado");    
 
     await product.destroy();
 
@@ -181,7 +275,6 @@ export class ProductsService {
     const { file, filename, type, idProduct, typeFormat } = fileUpload;
 
     const [filenameImage, extendsImage] = filename.split(".");
-    
     const nowDate = new Date();
     const newFileNameImage = filenameImage + "-" + new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(nowDate).toString() + "-" + nowDate.getTime().toString() + "." + extendsImage;
     const dataForm = new FormData();
@@ -206,7 +299,6 @@ export class ProductsService {
         }
       });
     } catch (error) {
-
       if(error.code === "ECONNREFUSED") throw new BadRequestException("No se envio correctamente al proveedor de imagenes");
     }
 
@@ -219,7 +311,7 @@ export class ProductsService {
       })
     } catch (error) {
 
-      throw new BadRequestException("No se guardo la imagen correctamente");
+      throw new InternalServerErrorException("No se guardo la imagen correctamente");
     }
 
     return {
@@ -230,5 +322,25 @@ export class ProductsService {
         type
       }
     }
+  }
+
+  private async calculateDiscount(price: number, idOffer: number): Promise<number> {
+
+    if(idOffer){
+
+      const offer = await Offer.findByPk(idOffer);
+  
+      if(!offer) throw new NotFoundException("La oferta ingresada no existe");
+  
+      return price - (price * offer.discount / 100);
+    }
+
+    return 0;
+  }
+
+  private generateSlug(title: string): string {
+    
+    const slug = title.toLowerCase().replace(/ /g, "-");
+    return slug + "-" + randomUUID().split("-").join("");
   }
 }

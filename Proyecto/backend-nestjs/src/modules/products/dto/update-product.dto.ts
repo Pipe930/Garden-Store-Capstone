@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, IsOptional, IsString, MaxLength, Min } from 'class-validator';
 
 export class UpdateProductDto {
 
@@ -17,6 +17,10 @@ export class UpdateProductDto {
     @MaxLength(100)
     readonly brand: string;
 
+    @IsBoolean()
+    @IsNotEmpty()
+    readonly published: boolean;
+
     @IsString()
     @IsNotEmpty()
     readonly returnPolicy: string;
@@ -28,4 +32,8 @@ export class UpdateProductDto {
     @IsNumber()
     @IsNotEmpty()
     readonly idCategory: number;
+
+    @IsNumber()
+    @IsOptional()
+    readonly idOffer: number;
 }

@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req, Put, ParseIntPipe } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
 import { AuthGuard } from 'src/core/guards/auth.guard';
 import { CreateTransbankDto } from './dto/create-transbank.dto';
+import { UpdateSaleDto } from './dto/update-status-sale.dto';
+import { RequestJwt } from 'src/core/interfaces/request-jwt.interface';
 
 @Controller('sales')
 export class SalesController {
@@ -10,14 +12,20 @@ export class SalesController {
 
   @Post('')
   @UseGuards(AuthGuard)
-  create(@Body() createSaleDto: CreateSaleDto, @Req() req: any) {
-    return this.salesService.create(createSaleDto, req.user.idUser);
+  create(@Body() createSaleDto: CreateSaleDto, @Req() request: RequestJwt) {
+    return this.salesService.create(createSaleDto, request.user.idUser);
   }
 
   @Get('user')
   @UseGuards(AuthGuard)
-  findAllSalesUser(@Req() req: any) {
-    return this.salesService.findUserSales(req.user.idUser);
+  findAllSalesUser(@Req() request: RequestJwt) {
+    return this.salesService.findUserSales(request.user.idUser);
+  }
+
+  @Put('status/:idSale')
+  @UseGuards(AuthGuard)
+  cancelSale(@Param('idSale', ParseIntPipe) idSale: number, @Body() updateSateDto: UpdateSaleDto) {
+    return this.salesService.updateStatusSale(idSale, updateSateDto);
   }
 
   @Post('transbank/create')

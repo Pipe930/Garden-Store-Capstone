@@ -2,19 +2,12 @@ import { randomUUID } from "crypto";
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { Product } from "src/modules/products/models/product.model";
 import { User } from "src/modules/users/models/user.model";
-import { Shipping } from "./shipping.model";
+import { Shipping } from "src/modules/shippings/models/shipping.model";
 
 export enum TypeStatus {
-
     PENDING = 'PENDIENTE',
     PAID = 'PAGADO',
     CANCELED = 'CANCELADO'
-}
-
-export enum TypeWithdrawal {
-
-    IN_STORE = 'EN TIENDA',
-    DELIVERY = 'A DOMICILIO'
 }
 
 @Table({
@@ -35,35 +28,50 @@ export class Sale extends Model {
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
-        field: 'price_net'
+        field: 'price_net',
+        validate: {
+            min: 1000
+        }
     })
     declare priceNet: number;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
-        field: 'price_iva'
+        field: 'price_iva',
+        validate: {
+            min: 100
+        }
     })
     declare priceIva: number;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
-        field: 'price_total'
+        field: 'price_total',
+        validate: {
+            min: 1000
+        }
     })
     declare priceTotal: number;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
-        field: 'discount_applied'
+        field: 'discount_applied',
+        validate: {
+            min: 0
+        }
     })
     declare discountApplied: number;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
-        field: 'products_quantity'
+        field: 'products_quantity',
+        validate: {
+            min: 1
+        }
     })
     declare productsQuantity: number;
 
@@ -72,12 +80,6 @@ export class Sale extends Model {
         allowNull: false
     })
     declare status: string;
-
-    @Column({
-        type: DataType.ENUM(TypeWithdrawal.IN_STORE, TypeWithdrawal.DELIVERY),
-        allowNull: false
-    })
-    declare withdrawal: string;
 
     @ForeignKey(() => User)
     @Column({

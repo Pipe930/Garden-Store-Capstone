@@ -11,7 +11,7 @@ import { Category } from '../categories/models/category.model';
 export class CartService {
 
     async findCartUser(idUser: number): Promise<ResponseData>{
-
+        
         const cart = await Cart.findOne<Cart>({
             where: {
                 idCartUser: idUser
@@ -19,7 +19,7 @@ export class CartService {
             include: [
                 {
                     model: Item,
-                    attributes: ["quantity", "priceUnit"],
+                    attributes: ["idItem", "quantity", "priceUnit"],
                     include: [
                         {
                             model: Product,
@@ -34,12 +34,15 @@ export class CartService {
                     ]
                 }
             ],
-            
+            order: [
+                [{model: Item, as: 'items'}, 'idItem', 'ASC']
+            ]
         });
 
         cart.priceTotal = this.cartTotal(cart);
         cart.quantityTotal = this.cartQuantity(cart);
         cart.productsTotal = this.cartProducts(cart);
+        cart.priceTotalDiscount = this.cartPriceDiscount(cart);
 
         if(!cart) throw new NotFoundException("Carrito no encontrado");
 
@@ -194,6 +197,17 @@ export class CartService {
         return total;
     }
 
+    private cartPriceDiscount(cart: Cart): number {
+
+        let total = 0;
+
+        cart.items.forEach(item => {
+            total += item.product.priceDiscount * item.quantity;
+        });
+
+        return total;
+    }
+
     private cartProducts(cart: Cart): number {
         return cart.items.length;
     }
@@ -202,11 +216,21 @@ export class CartService {
 
         if(item){
             item.quantity += quantity;
-            item.priceUnit = item.quantity * product.price;
+
+            if(product.idOffer){
+                item.priceUnit = item.quantity * product.priceDiscount;
+            } else {
+                item.priceUnit = item.quantity * product.price;
+            }
             await item.save();
         } else {
 
-            const priceUnit = product.price * quantity;
+            let priceUnit = 0;
+            if(product.idOffer){
+                priceUnit = quantity * product.priceDiscount;
+            } else {
+                priceUnit = quantity * product.price;
+            }
 
             await Item.create<Item>({
                 quantity,

@@ -1,6 +1,5 @@
-import { BadRequestException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpStatus, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { UpdateSaleDto } from './dto/update-sale.dto';
 import { Sale, SaleProduct, TypeStatus } from './models/sale.model';
 import { Cart } from '../cart/models/cart.model';
 import { Item } from '../cart/models/item.model';
@@ -8,6 +7,9 @@ import { ResponseData } from 'src/core/interfaces/response-data.interface';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { CreateTransbankDto } from './dto/create-transbank.dto';
+import { AvailabilityStatus, Product } from '../products/models/product.model';
+import { UpdateSaleDto } from './dto/update-status-sale.dto';
+import { Shipping } from '../shippings/models/shipping.model';
 
 @Injectable()
 export class SalesService {
@@ -19,7 +21,7 @@ export class SalesService {
 
   async create(createSaleDto: CreateSaleDto, idUser: number):Promise<ResponseData> {
 
-    let { priceTotal, productsQuantity, withdrawal, discountApplied } = createSaleDto;
+    let { priceTotal, productsQuantity, discountApplied } = createSaleDto;
 
     const cartUser = await Cart.findOne({
       where: {
@@ -42,12 +44,10 @@ export class SalesService {
         productsQuantity,
         discountApplied,
         status: TypeStatus.PENDING,
-        withdrawal,
         idUser
       });
 
       cartUser.items.forEach(async item => {
-
         await SaleProduct.create({
           idSale: sale.idSale,
           idProduct: item.idProduct,
@@ -65,7 +65,7 @@ export class SalesService {
       await cartUser.save();
 
     } catch (error) {  
-      throw new BadRequestException('No se pudo crear la venta');
+      throw new InternalServerErrorException('Error No se pudo crear la venta');
     }
     return {
       statusCode: HttpStatus.CREATED,
@@ -79,9 +79,14 @@ export class SalesService {
       where: {
         idUser
       },
-      include: {
-        model: SaleProduct
-      }
+      include: [
+        {
+          model: SaleProduct
+        },
+        {
+          model: Shipping
+        }
+      ]
     });
 
     if(sales.length === 0) throw new BadRequestException('No se encontraron ventas para el usuario');
@@ -90,6 +95,23 @@ export class SalesService {
       statusCode: HttpStatus.OK,
       data: sales
     };
+  }
+
+  async updateStatusSale(idSale: number, updateSaleDto: UpdateSaleDto): Promise<ResponseData> {
+
+    const sale = await Sale.findByPk(idSale);
+
+    if(!sale) throw new NotFoundException('No se encontro la venta');
+    if(sale.status === TypeStatus.PAID) throw new BadRequestException('La venta ya se encuentra pagada');
+
+    sale.status = updateSaleDto.status;
+    await sale.save();
+
+    return {
+
+      statusCode: HttpStatus.OK,
+      message: 'Estado de la venta actualizado con exito'
+    }
   }
 
   async createTransbankTransaction(createTransbankDto: CreateTransbankDto): Promise<ResponseData> {
@@ -139,8 +161,8 @@ export class SalesService {
     
     return {
       "Authorization": "Token",
-      "Tbk-Api-Key-Id": this.configService.get<string>('TBK_API_KEY_ID'),
-      "Tbk-Api-Key-Secret": this.configService.get<string>('TBK_API_KEY_SECRET'),
+      "Tbk-Api-Key-Id": this.configService.get<string>('tbkApiKeyId'),
+      "Tbk-Api-Key-Secret": this.configService.get<string>('tbkApiKeySecret'),
       "Content-Type": "application/json",
       "Access-Control-Allow-Origin": "*",
       'Referrer-Policy': 'origin-when-cross-origin',
@@ -157,5 +179,34 @@ export class SalesService {
     let percentageIva = 19 / 100;
     let netPrice = priceTotal - priceTotal * percentageIva;
     return netPrice;
+  }
+
+  private async validateStatusSale(status: string, sale: Sale): Promise<void> {
+
+    if(status !== TypeStatus.PAID) return;
+
+    const products = await SaleProduct.findAll({
+      where: {
+        idSale: sale.idSale
+      }
+    });
+
+    products.forEach(async productSale => {
+
+      const product = await Product.findByPk(productSale.idProduct);
+
+      if(product.stock < productSale.quantity) throw new BadRequestException('No hay stock suficiente para la venta');
+
+      product.stock -= productSale.quantity;
+      product.sold += productSale.quantity;
+
+      if(product.stock <= 10) product.availabilityStatus = AvailabilityStatus.LowStock;
+      if(product.stock === 0) product.availabilityStatus = AvailabilityStatus.OutOfStock;
+
+      await product.save();
+    });
+
+    sale.status = status;
+    await sale.save();
   }
 }

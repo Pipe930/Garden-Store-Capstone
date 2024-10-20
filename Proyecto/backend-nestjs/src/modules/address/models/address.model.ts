@@ -1,13 +1,14 @@
-import { BelongsTo, Column, DataType, ForeignKey, HasMany, Model, Table } from "sequelize-typescript";
+import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { Commune } from "./locates.model";
 import { User } from "src/modules/users/models/user.model";
+import { Branch } from "src/modules/branch/models/branch.model";
 
 @Table({
     tableName: "address",
     modelName: "Address",
     timestamps: false
 })
-export class Address extends Model {
+export class Address extends Model<Address> {
 
     @Column({
         primaryKey: true,
@@ -20,26 +21,38 @@ export class Address extends Model {
     @Column({
         type: DataType.STRING(255),
         allowNull: false,
+        validate: {
+            notEmpty: true
+        }
     })
     declare name: string;
 
     @Column({
         type: DataType.STRING(255),
         allowNull: false,
-        field: "address_name"
+        field: "address_name",
+        validate: {
+            notEmpty: true
+        }
     })
     declare addressName: string;
 
     @Column({
         type: DataType.STRING(10),
         allowNull: true,
-        field: "num_department"
+        field: "num_department",
+        validate: {
+            notEmpty: false
+        }
     })
     declare numDepartment: string;
 
     @Column({
         type: DataType.STRING(60),
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true
+        }
     })
     declare city: string;
 
@@ -61,6 +74,9 @@ export class Address extends Model {
 
     @HasMany(() => AddressUser)
     declare addressUser: AddressUser[];
+
+    @HasOne(() => Branch)
+    declare branch: Branch;
 }
 
 

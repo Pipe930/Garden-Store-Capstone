@@ -1,0 +1,329 @@
+{
+
+    "categories": [
+        {
+            "name": "maquinaria",
+            "slug": "",
+            "description": "categoria de productos para todas las maquinaria tanto ligera como pesada"
+        },
+        {
+            "name": "decoracion",
+            "slug": "",
+            "description": "categoria de productos decorativos para el hogar o el exterior"
+        },
+        {
+            "name": "herramientas",
+            "slug": "",
+            "description": "categoria de productos para objetos de utilidad tanto para el hogar como para el trabajo"
+        },
+        {
+            "name": "semillas",
+            "slug": "",
+            "description": "categoria de productos para bolsas de semillas de todo tipo"
+        },
+        {
+            "name": "plantas",
+            "slug": "",
+            "description": "categoria de productos para plantas de todo tipo"
+        },
+        {
+            "name": "fertilizantes",
+            "slug": "",
+            "description": "categoria de productos para fertilizantes de todo tipo"
+        },
+        {
+            "name": "insecticidas",
+            "slug": "",
+            "description": "categoria de productos para insecticidas de todo tipo"
+        },
+        {
+            "name": "herbicidas",
+            "slug": "",
+            "description": "categoria de productos para herbicidas de todo tipo"
+        }
+    ],
+    "roles": [
+        {
+            "name": "cliente",
+            "description": "rol para todos los usuarios que deseen comprar productos"
+        },
+        {
+            "name": "administrador",
+            "description": "rol para todos los usuarios que deseen administrar la tienda"
+        },
+        {
+            "name": "vendedor",
+            "description": "rol para todos los usuarios que deseen vender productos"
+        },
+        {
+            "name": "empleado",
+            "description": "rol para todos los usuarios que esten asignados a un area de trabajo"
+        },
+        {
+            "name": "proveedor",
+            "description": "rol para todos los usuarios que deseen vender productos a las sucursales"
+        },
+        {
+            "name": "staff",
+            "description": "rol para todos los usuarios que deseen administrar la tienda"
+        }
+    ],
+    "permissions": [
+
+        {
+            "name": "crear categorias",
+            "recourse": "categoria",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer categorias",
+            "recourse": "categoria",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar categorias",
+            "recourse": "categoria",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar categorias",
+            "recourse": "categoria",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear roles",
+            "recourse": "rol",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer roles",
+            "recourse": "rol",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar roles",
+            "recourse": "rol",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar roles",
+            "recourse": "rol",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear permisos",
+            "recourse": "permiso",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer permisos",
+            "recourse": "permiso",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar permisos",
+            "recourse": "permiso",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar permisos",
+            "recourse": "permiso",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear usuarios",
+            "recourse": "usuario",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer usuarios",
+            "recourse": "usuario",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar usuarios",
+            "recourse": "usuario",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar usuarios",
+            "recourse": "usuario",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear productos",
+            "recourse": "producto",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer productos",
+            "recourse": "producto",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar productos",
+            "recourse": "producto",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar productos",
+            "recourse": "producto",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear ventas",
+            "recourse": "venta",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer ventas",
+            "recourse": "venta",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar ventas",
+            "recourse": "venta",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar ventas",
+            "recourse": "venta",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear compras",
+            "recourse": "compra",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer compras",
+            "recourse": "compra",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar compras",
+            "recourse": "compra",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar compras",
+            "recourse": "compra",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear proveedores",
+            "recourse": "proveedor",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer proveedores",
+            "recourse": "proveedor",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar proveedores",
+            "recourse": "proveedor",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar proveedores",
+            "recourse": "proveedor",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear comentarios",
+            "recourse": "comentario",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer comentarios",
+            "recourse": "comentario",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar comentarios",
+            "recourse": "comentario",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar comentarios",
+            "recourse": "comentario",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear sucursales",
+            "recourse": "sucursal",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer sucursales",
+            "recourse": "sucursal",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar sucursales",
+            "recourse": "sucursal",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "crear empleados",
+            "recourse": "empleado",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer empleados",
+            "recourse": "empleado",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar empleados",
+            "recourse": "empleado",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar empleados",
+            "recourse": "empleado",
+            "actions": "DELETE"
+        },
+        {
+            "name": "leer reseñas",
+            "recourse": "resenas",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar reseñas",
+            "recourse": "resenas",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar reseñas",
+            "recourse": "resenas",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear reseñas",
+            "recourse": "resenas",
+            "actions": "CREATE"
+        },
+        {
+            "name": "leer publicaciones",
+            "recourse": "posts",
+            "actions": "READ"
+        },
+        {
+            "name": "actualizar publicaciones",
+            "recourse": "posts",
+            "actions": "UPDATE"
+        },
+        {
+            "name": "eliminar publicaciones",
+            "recourse": "posts",
+            "actions": "DELETE"
+        },
+        {
+            "name": "crear publicaciones",
+            "recourse": "posts",
+            "actions": "CREATE"
+        }
+    ]
+}

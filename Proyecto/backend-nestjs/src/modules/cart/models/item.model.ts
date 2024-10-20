@@ -13,20 +13,26 @@ export class Item extends Model {
         primaryKey: true,
         autoIncrement: true,
         type: DataType.INTEGER,
-        field: "id_item_cart"
+        field: "id_item"
     })
-    declare idItemCart: number;
+    declare idItem: number;
 
     @Column({
         type: DataType.INTEGER,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            min: 1
+        }
     })
     declare quantity: number;
 
     @Column({
         type: DataType.INTEGER,
         allowNull: false,
-        field: "price_unit"
+        field: "price_unit",
+        validate: {
+            min: 1000
+        }
     })
     declare priceUnit: number;
 

@@ -17,6 +17,11 @@ import { AddressModule } from './modules/address/address.module';
 import { SalesModule } from './modules/sales/sales.module';
 import { InsertDataService } from './core/services/insert-data.service';
 import { HttpModule } from '@nestjs/axios';
+import { OffersModule } from './modules/offers/offers.module';
+import { BranchModule } from './modules/branch/branch.module';
+import { ShippingsModule } from './modules/shippings/shippings.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
+import { PurchaseModule } from './modules/purchase/purchase.module';
 
 @Module({
   imports: [
@@ -45,7 +50,12 @@ import { HttpModule } from '@nestjs/axios';
     ProductsModule,
     CartModule,
     AddressModule,
-    SalesModule
+    SalesModule,
+    OffersModule,
+    BranchModule,
+    ShippingsModule,
+    SubscriptionsModule,
+    PurchaseModule
   ],
   providers: [
     {

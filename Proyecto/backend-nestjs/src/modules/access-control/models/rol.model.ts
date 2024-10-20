@@ -1,12 +1,11 @@
-import { Column, DataType, Table, Model, Sequelize, ForeignKey, BelongsToMany, BeforeCreate } from "sequelize-typescript";
+import { Column, DataType, Table, Model, Sequelize, ForeignKey, BelongsToMany } from "sequelize-typescript";
 import { User } from "../../users/models/user.model";
 import { Permission, RolePermission } from "./permission.model";
 
-
 @Table({
-    tableName: "role",
+    tableName: "roles",
     modelName: "Role",
-    timestamps: true
+    timestamps: false
 })
 export class Role extends Model {
 
@@ -21,7 +20,10 @@ export class Role extends Model {
     @Column({
         type: DataType.STRING(40),
         unique: true,
-        allowNull: false
+        allowNull: false,
+        validate: {
+            notEmpty: true
+        }
     })
     declare name: string;
 
