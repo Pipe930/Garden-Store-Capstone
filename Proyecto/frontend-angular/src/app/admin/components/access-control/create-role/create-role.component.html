@@ -1,0 +1,62 @@
+<div class="container__container-title">
+  <h2 class="container__container-title">Crear Rol</h2>
+  <button class="container__btn btn btn-primary" [routerLink]="['/admin/access-control/list']">Volver</button>
+</div>
+
+<div class="container__container-form">
+
+  <form novalidate class="container-form__form" [formGroup]="createRoleForm" (ngSubmit)="createRole()">
+
+    <div class="mb-3">
+      <label for="nameInput" class="form-label">Nombre Rol</label>
+      <input type="text" class="form-control form__input" id="nameInput" formControlName="name" [ngClass]="{
+        'is-invalid': name.invalid && (name.dirty || name.touched)
+      }">
+      @if(name.getError("required")){
+        <span class="invalid-feedback">Este campo es requerido</span>
+      }
+      @if(name.getError("maxlength")){
+        <span class="invalid-feedback">Tiene que tener un maximo de 100 caracteres</span>
+      }
+    </div>
+    <div class="container my-5">
+      <h2 class="mb-4">Permisos</h2>
+      <div class="row">
+          <div class="col-md-5">
+              <h5>Permisos Disponibles</h5>
+              <select #availableOptions class="form-select" multiple size="10">
+                @for (permission of listPermissions(); track $index) {
+                  <option [value]="permission.idPermission">{{permission.name}}</option>
+                }
+              </select>
+          </div>
+
+          <div class="col-md-2 d-flex flex-column align-items-center justify-content-center">
+              <button id="moveRight" (click)="moveRight(availableOptions.selectedOptions)" type="button" class="btn btn-primary my-2">&gt;</button>
+              <button id="moveLeft" (click)="moveLeft(selectedOptions.selectedOptions)" type="button" class="btn btn-primary my-2">&lt;</button>
+          </div>
+
+          <div class="col-md-5">
+              <h5>Permisos Seleccionados</h5>
+              <select #selectedOptions class="form-select" size="10">
+                @for (permission of selectedPermissions(); track $index) {
+                  <option [value]="permission.idPermission">{{permission.name}}</option>
+                }
+              </select>
+          </div>
+      </div>
+
+      <div class="row mt-3">
+          <div class="col-md-5">
+              <button id="selectAll" (click)="selectAll()" type="button" class="btn btn-secondary w-100">Choose all</button>
+          </div>
+          <div class="col-md-5 offset-md-2">
+              <button id="removeAll" (click)="removeAll()" type="button" class="btn btn-secondary w-100">Remove all</button>
+          </div>
+      </div>
+    </div>
+    <button type="submit" class="form__btn-create btn btn-success" [disabled]="createRoleForm.invalid">
+      Guardar
+    </button>
+  </form>
+</div>

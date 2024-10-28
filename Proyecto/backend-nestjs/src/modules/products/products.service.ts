@@ -58,10 +58,8 @@ export class ProductsService {
 
     let { page, limit } = paginateDto;
 
-    if(!page || !limit){
-      page = 1
-      limit = 20
-    }
+    if(!page) page = 1;
+    if(!limit) limit = 20;
 
     const offset = (page - 1) * limit;
     const products = await Product.findAll<Product>({
@@ -192,11 +190,18 @@ export class ProductsService {
     if(!title) title = "";
     if(!category) category = 0;
 
+    const whereCondition: any = {};
+
+    if (title !== "") {
+      whereCondition.title = { [Op.iLike]: `%${title}%` };
+    }
+
+    if (category !== 0) {
+      whereCondition.idCategory = category;
+    }
+
     const products = await Product.findAll<Product>(
-      { where: { [Op.or]: {
-        title: { [Op.iLike]: `%${title}%` },
-        idCategory: category
-      } },
+      { where: whereCondition,
       include: [
         {
           model: ImagesProduct,

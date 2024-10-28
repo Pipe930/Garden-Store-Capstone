@@ -10,6 +10,12 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { RequestJwt } from 'src/core/interfaces/request-jwt.interface';
 import { DeleteAccountDto } from './dto/delete-account.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { ResendOTPDto } from './dto/resend-otp.dto';
+import { Permissions } from 'src/core/decorators/permissions.decorator';
+import { ResourcesEnum } from 'src/core/enums/resourses.enum';
+import { ActionsEnum } from 'src/core/enums/actions.enum';
+import { PermissionsGuard } from 'src/core/guards/permissions.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -27,10 +33,11 @@ export class AuthController {
     }
 
     @Get('profile')
-    @UseGuards(AuthGuard)
-    profile(@Req() req){
+    @Permissions([{resource: ResourcesEnum.REVIEWS, action: [ActionsEnum.DELETE]}])
+    @UseGuards(AuthGuard, PermissionsGuard)
+    profile(@Req() request: RequestJwt){
 
-        console.log(req.user)
+        console.log(request.user);
         return 'profile';
     }
 
@@ -58,6 +65,16 @@ export class AuthController {
     @UseGuards(AuthGuard)
     changePassword(@Body() changePasswordDto: ChangePasswordDto, @Req() request: RequestJwt){
         return this.authService.changePassword(changePasswordDto, request.user.idUser);
+    }
+
+    @Post('verifyOTP')
+    verifyOPT(@Body() verifyOTP: VerifyOtpDto){
+        return this.authService.verifyOTP(verifyOTP);
+    }
+
+    @Post('resendOTP')
+    resendOTP(@Body() resendOTP: ResendOTPDto){
+        return this.authService.resendOTP(resendOTP);
     }
 
     @Get('logout')
