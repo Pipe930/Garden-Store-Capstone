@@ -30,6 +30,22 @@ export const routesAdmin: Routes = [
       {
         path: "access-control",
         loadChildren: () => import('./components/access-control/access-control.routes').then(m => m.routesAccessControl)
+      },
+      {
+        path: "branchs",
+        loadChildren: () => import('./components/branchs/branchs.routes').then(m => m.routesBranchs)
+      },
+      {
+        path: "purchases",
+        loadChildren: () => import('./components/purchases/purchases.routes').then(m => m.routesPurchases)
+      },
+      {
+        path: "suppliers",
+        loadChildren: () => import('./components/suppliers/suppliers.routes').then(m => m.routesSuppliers)
+      },
+      {
+        path: "employees",
+        loadChildren: () => import('./components/employees/employees.routes').then(m => m.routesEmployees)
       }
     ]
   }

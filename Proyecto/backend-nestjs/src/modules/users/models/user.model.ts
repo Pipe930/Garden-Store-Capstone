@@ -5,6 +5,7 @@ import { Address, AddressUser } from "src/modules/address/models/address.model";
 import { Subscription } from "src/modules/subscriptions/models/subscription.model";
 import { UserOPTVerification } from "./userOPTVerification";
 import { Sale } from "src/modules/sales/models/sale.model";
+import { Comment } from "src/modules/comments/models/comment.model";
 
 @Table({
     tableName: "users",
@@ -78,9 +79,8 @@ export class User extends Model {
         allowNull: false,
         unique: true,
         validate: {
-            is: /^\+56\d{9}$/,
-            notEmpty: true,
-            len: [12, 12]
+            is: /^\+569\d{8}$/,
+            notEmpty: true
         }
     })
     declare phone: string;
@@ -112,4 +112,7 @@ export class User extends Model {
 
     @HasMany(() => AddressUser)
     declare addresses: Address[];
+
+    @HasMany(() => Comment)
+    declare comments: Comment[];
 }

@@ -25,22 +25,20 @@ export class CreateUserDto {
     readonly createdCart: boolean;
 
     @IsString()
-    @MaxLength(255)
+    @MaxLength(50)
     @MinLength(8)
     @IsNotEmpty()
     @Transform(({value}) => value.trim())
     readonly password: string;
 
     @IsString()
-    @MaxLength(255)
+    @MaxLength(50)
     @MinLength(8)
     @IsNotEmpty()
     @Transform(({value}) => value.trim())
     readonly rePassword: string;
 
     @IsString()
-    @MaxLength(12)
-    @MinLength(12)
     @IsNotEmpty()
     @Transform(({value}) => value.trim())
     @Matches(/^\+56\d{9}$/, { message: "El numero de telefono no es valido" })

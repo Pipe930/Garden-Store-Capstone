@@ -13,8 +13,13 @@ export enum ResourcesEnum {
     CATEGORIES = "categorias",
     REVIEWS = "resenas",
     POSTS = "publicaciones",
-    PROVIDERS = "proveedores",
+    POSTSUSER = "publicaciones-usuario",
+    SUPPLIERS = "proveedores",
     BRANCHS = "sucursales",
     OFFERS = "ofertas",
-    WARRANTIES = "garantias"
+    WARRANTIES = "garantias",
+    SHIPPINGS = "envios",
+    ADDRESS = "direcciones",
+    ADDRESSUSER = "direcciones-usuario",
+    TAGS = "etiquetas"
 }

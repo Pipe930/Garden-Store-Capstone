@@ -22,6 +22,9 @@ import { BranchModule } from './modules/branch/branch.module';
 import { ShippingsModule } from './modules/shippings/shippings.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { PurchaseModule } from './modules/purchase/purchase.module';
+import { SuppliersModule } from './modules/suppliers/suppliers.module';
+import { PostsModule } from './modules/posts/posts.module';
+import { CommentsModule } from './modules/comments/comments.module';
 
 @Module({
   imports: [
@@ -35,7 +38,7 @@ import { PurchaseModule } from './modules/purchase/purchase.module';
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('keyJwt'),
-        signOptions: {  expiresIn: '60m' }
+        signOptions: {  expiresIn: '30m' }
       }),
       inject: [ConfigService],
       global: true
@@ -55,7 +58,10 @@ import { PurchaseModule } from './modules/purchase/purchase.module';
     BranchModule,
     ShippingsModule,
     SubscriptionsModule,
-    PurchaseModule
+    PurchaseModule,
+    SuppliersModule,
+    PostsModule,
+    CommentsModule
   ],
   providers: [
     {
@@ -63,7 +69,7 @@ import { PurchaseModule } from './modules/purchase/purchase.module';
       useClass: MorganInterceptor("combined"),
     },
     InsertDataService
-  ]
+  ],
 })
 export class AppModule implements NestModule {
 

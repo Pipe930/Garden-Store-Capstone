@@ -2,23 +2,41 @@ import { Address } from "./address";
 
 export interface Purchase {
 
-  createAt: Date;
-  updateAt: Date;
+  idSale: string;
   priceNet: number;
   priceIva: number;
   priceTotal: number;
   discountApplied: number;
   productsQuantity: number;
-  status: string;
-  withdrawal: string;
-  user: number;
+  statusPayment: string;
+  idUser: number;
+  createdAt: Date;
+  updatedAt: Date;
+  saleProducts: PurchaseProduct[];
+  shipping: null;
+}
+
+interface ProductPurchase {
+
+  title: string;
+  price: number;
+}
+
+export interface PurchaseProduct {
+  product: ProductPurchase;
+  quantity: number;
+}
+
+export interface ResponseListUserPurchase {
+  status: number;
+  data: Purchase[];
 }
 
 export interface ResponseListPurchase {
 
   status: string;
   count: number;
-  data: Array<Purchase>;
+  data: Purchase[];
 }
 
 export enum TypeStatusEnum {
@@ -30,8 +48,8 @@ export enum TypeStatusEnum {
 
 export enum TypeRetirementEnum {
 
-  STORE_PICKUP = 'EN TIENDA',
-  HOME_DELIVERY = 'A DOMICILIO'
+  STORE_PICKUP = 'RETIRO EN TIENDA',
+  HOME_DELIVERY = 'DESPACHO A DOMICILIO'
 }
 
 export enum TypeStatusTransbankEnum {
@@ -104,10 +122,36 @@ export interface Voucher {
   discountApplied: number;
 }
 
+export interface VoucherConfirm {
+
+  address: Address;
+  typePerson: string;
+  typePay: string;
+  typeRetirement: string;
+  shippingCost: number;
+  idSale: number;
+}
+
+export interface Shipping {
+
+  informationShipping: string;
+  shippingCost: number;
+  idAddress: number;
+}
+
+export interface UpdateVoucher {
+
+  status: string;
+  shipping?: Shipping;
+}
+
 export interface CreateVoucher {
+
+  withdrawal: string;
   productsQuantity: number;
   priceTotal: number;
   discountApplied: number;
+  idBranch?: number;
 }
 
 
@@ -115,7 +159,6 @@ export const VoucherObject: Voucher = {
   address: {
     address: {
       idAddress: 0,
-      name: "",
       addressName: "",
       city: "",
       description: "",
@@ -124,6 +167,7 @@ export const VoucherObject: Voucher = {
         name: ""
       }
     },
+    name: "",
     idAddress: 0,
     idAddressUser: 0,
     idUser: 0

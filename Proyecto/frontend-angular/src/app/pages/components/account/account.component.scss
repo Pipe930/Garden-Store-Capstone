@@ -1,0 +1,122 @@
+@import '../../../../themes/variables.scss';
+
+.profile{
+  padding: 3rem;
+
+  .profile__title{
+    margin-bottom: 2rem;
+  }
+
+  .profile__container{
+
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr)  7fr;
+    width: 100%;
+    border-top: 1px solid $color-dark-300;
+
+    .profile__content{
+
+      border-left: 1px solid $color-dark-300;
+      padding: 2.6rem;
+
+      .address__container-header{
+
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+      .address__container-list{
+
+        .address__list{
+
+          padding-left: 0;
+
+          .address__item{
+
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            padding: 1.6rem;
+            background-color: $color-dark-50;
+
+            .address__container-list{
+
+              .address__container-list-up{
+
+                margin-bottom: 1rem;
+              }
+            }
+          }
+        }
+      }
+
+      .shipment__title-content{
+
+        margin-bottom: 1rem;
+      }
+
+      .shipment__table{
+
+        width: 100%;
+        border: none;
+
+        .shipment__table-head{
+
+          background-color: $color-success-600;
+          color: $color-light;
+          margin: 1rem;
+
+          tr{
+
+            th{
+
+              padding: 1rem;
+            }
+          }
+        }
+
+        .shipment__table-body{
+
+          tr{
+
+            td{
+              text-align: center;
+              padding: 1rem;
+              background-color: $color-dark-50;
+
+              .shipment__message{
+
+                font-size: 14px;
+              }
+            }
+          }
+        }
+      }
+
+      .profile__container-information{
+
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+      }
+
+
+      .profile__list{
+        padding-left: 0;
+
+        li{
+          padding: 1rem 0;
+        }
+      }
+
+      .profile__form{
+
+        .form__control{
+
+          padding: 1rem 0;
+        }
+      }
+    }
+  }
+}
