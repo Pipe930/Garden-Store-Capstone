@@ -1,0 +1,30 @@
+@let listPostsVar = listPosts();
+
+<div class="container-lg py-5">
+
+  <div class="container-fluid d-flex justify-content-between">
+    <h2>Mis Publicaciones</h2>
+    <button type="button" class="btn btn-success" [routerLink]="['/manage-posts/create']">Crear Publicación</button>
+  </div>
+
+  <div class="container-fluid py-4">
+
+    <div class="input-group">
+      <input type="search" class="form-control" placeholder="Buscar...">
+      <button class="btn btn-success" type="button">
+        <i class='bx bx-search-alt-2'></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="container-fluid">
+
+    <div class="row">
+      @for (post of listPostsVar; track $index) {
+        <div class="col-lg-6">
+          <app-card-post [post]="post" [isActionsButtons]="true"/>
+        </div>
+      }
+    </div>
+  </div>
+</div>

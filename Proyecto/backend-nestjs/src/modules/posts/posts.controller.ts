@@ -1,6 +1,6 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, ParseIntPipe, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, ParseIntPipe, Req, Query } from '@nestjs/common';
 import { PostsService } from './posts.service';
-import { CreatePostDto } from './dto/create-post.dto';
+import { CreatePostDto, CreatePostUserDto } from './dto/create-post.dto';
 import { UpdatePostDto, UpdatePostUserDto } from './dto/update-post.dto';
 import { Auth } from 'src/core/decorators/auth.decorator';
 import { ResourcesEnum } from 'src/core/enums/resourses.enum';
@@ -8,6 +8,9 @@ import { ActionsEnum } from 'src/core/enums/actions.enum';
 import { CreateTagDto } from './dto/create-tag.dto';
 import { UpdateTagDto } from './dto/update-tag.dto';
 import { RequestJwt } from 'src/core/interfaces/request-jwt.interface';
+import { PaginateDto } from '../products/dto/paginate.dto';
+import { SearchPostDto } from './dto/search-post.dto';
+import { CreateReactionDto } from './dto/create-reaction.dto';
 
 @Controller('posts')
 export class PostsController {
@@ -20,8 +23,14 @@ export class PostsController {
   }
 
   @Get()
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@Query() paginateDto: PaginateDto) {
+    return this.postsService.findAll(paginateDto);
+  }
+
+  @Get('admin')
+  @Auth([{ resource: ResourcesEnum.POSTS, action: [ActionsEnum.READ] }])
+  findAllAdmin() {
+    return this.postsService.findAllAdmin();
   }
 
   @Get('post/:id')
@@ -44,14 +53,19 @@ export class PostsController {
 
   @Post('user')
   @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.CREATE] }])
-  createPostUser(@Body() createPostDto: CreatePostDto, @Req() request: RequestJwt) {
+  createPostUser(@Body() createPostDto: CreatePostUserDto, @Req() request: RequestJwt) {
     return this.postsService.createPostUser(createPostDto, request.user.idUser);
   }
 
   @Get('user')
   @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.READ] }])
-  findAllPostsUser(@Req() request: RequestJwt) {
-    return this.postsService.findAllPostsUser(request.user.idUser);
+  findAllPostsUser(@Req() request: RequestJwt, @Query() paginateDto: PaginateDto) {
+    return this.postsService.findAllPostsUser(request.user.idUser, paginateDto);
+  }
+
+  @Get('image/:slug')
+  getImagePost(@Param('slug') slug: string) {
+    return this.postsService.getImagesPost(slug);
   }
 
   @Get('slug/:slug')
@@ -59,16 +73,44 @@ export class PostsController {
     return this.postsService.findOneBySlug(slug);
   }
 
-  @Put('user/:id')
-  @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.UPDATE] }])
-  updatePostUser(@Param('id', ParseIntPipe) id: number, @Body() updatePostDto: UpdatePostUserDto, @Req() request: RequestJwt) {
-    return this.postsService.updatePostUser(id, request.user.idUser, updatePostDto);
+  @Get('search')
+  searchPost(@Query() query: SearchPostDto) {
+    return this.postsService.postSearch(query);
   }
 
-  @Delete('user/:id')
+  @Get('filter/:idTag')
+  filterPost(@Param('idTag', ParseIntPipe) idTag: number) {
+    return this.postsService.filterTagPost(idTag);
+  }
+
+  @Put('user/:slug')
+  @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.UPDATE] }])
+  updatePostUser(@Param('slug') slug: string, @Body() updatePostDto: UpdatePostUserDto, @Req() request: RequestJwt) {
+    return this.postsService.updatePostUser(slug, request.user.idUser, updatePostDto);
+  }
+
+  @Delete('user/:slug')
   @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.DELETE] }])
-  removePostUser(@Param('id', ) id: number, @Req() request: RequestJwt) {
-    return this.postsService.removePostUser(id, request.user.idUser);
+  removePostUser(@Param('slug') slug: string, @Req() request: RequestJwt) {
+    return this.postsService.removePostUser(slug, request.user.idUser);
+  }
+
+  @Post('like')
+  @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.CREATE] }])
+  likePost(@Body() body: CreateReactionDto, @Req() request: RequestJwt) {
+    return this.postsService.createReactionLike(body, request.user.idUser);
+  }
+
+  @Post('dislike')
+  @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.CREATE] }])
+  dislikePost(@Body() body: CreateReactionDto, @Req() request: RequestJwt) {
+    return this.postsService.createReactionDislike(body, request.user.idUser);
+  }
+
+  @Get('reaction/:idPost')
+  @Auth([{ resource: ResourcesEnum.POSTSUSER, action: [ActionsEnum.READ] }])
+  getReactions(@Param('idPost', ParseIntPipe) idPost: number, @Req() request: RequestJwt) {
+    return this.postsService.getReactionUser(idPost, request.user.idUser);
   }
 
   @Post('tags')
@@ -83,6 +125,7 @@ export class PostsController {
   }
 
   @Get('tags/:id')
+  @Auth([{ resource: ResourcesEnum.TAGS, action: [ActionsEnum.READ] }])
   findOneTag(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.findOneTag(id);
   }

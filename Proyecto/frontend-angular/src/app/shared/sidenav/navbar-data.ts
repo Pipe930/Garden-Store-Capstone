@@ -74,7 +74,7 @@ export const navbarData: Array<Sidenav> = [
     items: [
       {
         routerLink: "access-control/list",
-        label: "Lista Roles & Permisos"
+        label: "Roles & Permisos"
       },
       {
         routerLink: "access-control/role/create",
@@ -139,6 +139,17 @@ export const navbarData: Array<Sidenav> = [
       {
         routerLink: "suppliers/create",
         label: "Crear Proveedor"
+      }
+    ]
+  },
+  {
+    routerLink: "posts",
+    icon: "bx bxs-news",
+    label: "Publicaciones",
+    items: [
+      {
+        routerLink: "posts/list",
+        label: "Publicaciones y Etiquetas"
       }
     ]
   }

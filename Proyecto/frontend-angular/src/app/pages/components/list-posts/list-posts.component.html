@@ -1,0 +1,109 @@
+@let currentPageVar = currentPage();
+@let totalPageVar = totalPages();
+@let validSessionVar = validSession();
+@let listTagsVar = listTags();
+@let listPostsVar = listPosts();
+@let isLoadingVar = isLoading();
+
+<!-- Page content-->
+<div class="container-lg py-5">
+  <div class="row">
+      <!-- Blog entries-->
+      <div class="col-lg-8">
+          <div class="row">
+
+              @defer (when isLoadingVar) {
+
+                @for (post of listPostsVar; track $index) {
+                  <div class="col-lg-6">
+                    <app-card-post [post]="post"/>
+                  </div>
+                } @empty {
+                  <span class="fs-5 mb-4 text-center">No se han encontrado publicaciones</span>
+                }
+              } @placeholder {
+                @for (item of cardsPlaceholder(); track $index) {
+
+                  <div class="col-lg-6">
+                    <div class="card mb-4" aria-hidden="true">
+                      <img src="../../../../assets/imgs/image-loading.jpg" class="card-img-top">
+                      <div class="card-body">
+                        <h5 class="card-title placeholder-glow">
+                          <span class="placeholder col-6"></span>
+                        </h5>
+                        <p class="card-text placeholder-glow">
+                          <span class="placeholder badge text-bg-success me-1 my-2"></span>
+                          <span class="placeholder col-7"></span>
+                          <span class="placeholder col-4"></span>
+                          <span class="placeholder col-4"></span>
+                          <span class="placeholder col-6"></span>
+                          <span class="placeholder col-8"></span>
+                        </p>
+                        <a class="btn btn-primary disabled placeholder col-6" aria-disabled="true"></a>
+                      </div>
+                    </div>
+                  </div>
+                }
+              }
+          </div>
+
+          <nav aria-label="Pagination">
+            <hr class="my-0" />
+            <ul class="pagination justify-content-center my-4">
+              <li class="page-item" [class.disabled]="currentPageVar === 1">
+                <a class="page-link" (click)="changePage(currentPageVar - 1)" tabindex="-1" [attr.aria-disabled]="currentPageVar === 1">Anterior</a>
+              </li>
+
+              @for (page of pagesToShow; track $index) {
+                <li class="page-item" [class.active]="currentPageVar === page" (click)="changePage(page)">
+                  <a class="page-link">{{ page }}</a>
+                </li>
+              }
+
+              <li class="page-item" [class.disabled]="currentPageVar === totalPageVar">
+                <a class="page-link" (click)="changePage(currentPageVar + 1)" [attr.aria-disabled]="currentPageVar === totalPageVar">Siguiente</a>
+              </li>
+            </ul>
+          </nav>
+      </div>
+      <!-- Side widgets-->
+      <div class="col-lg-4">
+          @if (validSessionVar) {
+              <div class="card mb-4">
+              <div class="card-header">Gestionar Publicaciones</div>
+              <div class="card-body">
+                  <a class="btn btn-primary" [routerLink]="['/manage-posts/create']">Crear Publicación</a>
+                  <a class="btn btn-primary" [routerLink]="['/manage-posts/list']">Mis Publicaciones</a>
+              </div>
+              </div>
+          }
+          <!-- Search widget-->
+          <div class="card mb-4">
+              <div class="card-header">Buscador</div>
+              <div class="card-body">
+                  <div class="input-group">
+                      <input class="form-control" type="search" placeholder="Buscar..." aria-label="Buscar..." aria-describedby="button-search" #searchElement/>
+                      <button class="btn btn-primary" id="button-search" type="button" (click)="searchPosts()">
+                          <i class='bx bx-search-alt-2 bx-xs'></i>
+                      </button>
+                  </div>
+              </div>
+          </div>
+          <!-- Categories widget-->
+          <div class="card mb-4">
+              <div class="card-header">Etiquetas</div>
+              <div class="card-body">
+                  <div class="row">
+                      @for (tag of listTagsVar; track $index) {
+                        <div class="col-sm-6">
+                            <ul class="list-unstyled mb-0">
+                                <li><button type="button" class="btn btn-success my-1" (click)="selectTag(tag.idTag)">{{tag.name}}</button></li>
+                            </ul>
+                        </div>
+                      }
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
