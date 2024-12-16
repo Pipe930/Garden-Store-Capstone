@@ -2,10 +2,11 @@ import { randomUUID } from "crypto";
 import { BelongsTo, Column, DataType, ForeignKey, HasMany, HasOne, Model, Table } from "sequelize-typescript";
 import { Product } from "src/modules/products/models/product.model";
 import { User } from "src/modules/users/models/user.model";
-import { Shipping } from "src/modules/shippings/models/shipping.model";
 import { StatusSaleEnum } from "src/core/enums/statusSale.enum";
-import { ShippingStatusEnum, WithdrawalEnum } from "src/core/enums/statusShipping.enum";
 import { Branch } from "src/modules/branch/models/branch.model";
+import { MethodPaymentEnum } from "src/core/enums/statusPurchase.enum";
+import { DeviceUsedEnum } from "src/core/enums/deviceUsed.enum";
+import { Order } from "src/modules/orders/models/order.model";
 
 @Table({
     tableName: 'sales',
@@ -53,6 +54,20 @@ export class Sale extends Model {
     declare priceTotal: number;
 
     @Column({
+        type: DataType.ENUM(...Object.values(MethodPaymentEnum)),
+        allowNull: true,
+        field: 'method_payment'
+    })
+    declare methodPayment: string;
+
+    @Column({
+        type: DataType.ENUM(...Object.values(DeviceUsedEnum)),
+        allowNull: false,
+        field: 'device_used'
+    })
+    declare deviceUsed: string;
+
+    @Column({
         type: DataType.INTEGER,
         allowNull: false,
         field: 'discount_applied',
@@ -71,19 +86,6 @@ export class Sale extends Model {
         }
     })
     declare productsQuantity: number;
-
-    @Column({
-        type: DataType.ENUM(...Object.values(ShippingStatusEnum)),
-        defaultValue: ShippingStatusEnum.PREPARATION,
-        allowNull: false
-    })
-    declare statusOrder: string;
-
-    @Column({
-        type: DataType.ENUM(...Object.values(WithdrawalEnum)),
-        allowNull: false
-    })
-    declare withdrawal: string;
 
     @Column({
         type: DataType.ENUM(...Object.values(StatusSaleEnum)),
@@ -111,10 +113,9 @@ export class Sale extends Model {
     @HasMany(() => SaleProduct)
     declare saleProducts: SaleProduct[];
 
-    @HasOne(() => Shipping)
-    declare shipping: Shipping;
+    @HasOne(() => Order)
+    declare order: Order;
 }
-
 
 @Table({
     tableName: 'sale_product',
@@ -133,7 +134,6 @@ export class SaleProduct extends Model {
 
     @ForeignKey(() => Sale)
     @Column({
-        primaryKey: true,
         type: DataType.UUID,
         field: 'id_sale'
     })
@@ -141,7 +141,6 @@ export class SaleProduct extends Model {
 
     @ForeignKey(() => Product)
     @Column({
-        primaryKey: true,
         type: DataType.INTEGER,
         field: 'id_product'
     })

@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req, Put, ParseIntPipe, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Req, Put, ParseUUIDPipe, Res } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDto } from './dto/create-sale.dto';
-import { AuthGuard } from 'src/core/guards/auth.guard';
 import { CreateTransbankDto } from './dto/create-transbank.dto';
 import { UpdateSaleDto } from './dto/update-status-sale.dto';
 import { RequestJwt } from 'src/core/interfaces/request-jwt.interface';
 import { Auth } from 'src/core/decorators/auth.decorator';
 import { ResourcesEnum } from 'src/core/enums/resourses.enum';
 import { ActionsEnum } from 'src/core/enums/actions.enum';
+import { Response } from 'express';
+import { GeneratePDFDto } from './dto/generatePDF.dto';
+import { CommitPaypalDto, CreatePaypalDto } from './dto/create-paypal';
 
 @Controller('sales')
 export class SalesController {
@@ -16,7 +18,36 @@ export class SalesController {
   @Post()
   @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.CREATE] }])
   create(@Body() createSaleDto: CreateSaleDto, @Req() request: RequestJwt) {
-    return this.salesService.create(createSaleDto, request.user.idUser);
+    return this.salesService.create(createSaleDto, request.user.idUser, request.headers['user-agent']);
+  }
+
+  @Get()
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.READ] }])
+  findAll() {
+    return this.salesService.findAll();
+  }
+
+  @Get('analytics/:idSale')
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.READ] }])
+  getSaleAnalytics(@Param('idSale', ParseUUIDPipe) idSale: string) {
+    return this.salesService.saleAnalytics(idSale);
+  }
+
+  @Get('detail/:idSale')
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.READ] }])
+  findOne(@Param('idSale', ParseUUIDPipe) idSale: string) {
+    return this.salesService.findOne(idSale);
+  }
+
+  @Post('generatePDF')
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.READ] }])
+  async generatePDF(@Body() generatePdfDto: GeneratePDFDto, @Res() response: Response) {
+
+    const pdfDoc = await this.salesService.generatePdfSale(generatePdfDto);
+    response.setHeader('Content-Type', 'application/pdf');
+
+    pdfDoc.pipe(response);
+    pdfDoc.end();
   }
 
   @Get('user')
@@ -31,15 +62,33 @@ export class SalesController {
     return this.salesService.updateStatusSale(idSale, updateSateDto);
   }
 
+  @Get('validDelivered/:idSale')
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.READ] }])
+  validSaleDelivered(@Param('idSale', ParseUUIDPipe) idSale: string){
+    return this.salesService.validSaleDelivered(idSale);
+  }
+
   @Post('transbank/create')
   @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.CREATE] }])
-  createTransbank(@Body() createTransbankDto: CreateTransbankDto) {
-    return this.salesService.createTransbankTransaction(createTransbankDto);
+  createTransbank(@Body() createTransbankDto: CreateTransbankDto, @Req() request: RequestJwt) {
+    return this.salesService.createTransbankTransaction(createTransbankDto, request);
   }
 
   @Get('transbank/commit/:token')
   @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.CREATE] }])
   commitTransbank(@Param('token') token: string) {
     return this.salesService.commitTransbankTransaction(token);
+  }
+
+  @Post('paypal/create')
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.CREATE] }])
+  createPaypal(@Body() createPaypal: CreatePaypalDto) {
+    return this.salesService.createPaypalTransaction(createPaypal);
+  }
+
+  @Post('paypal/commit')
+  @Auth([{ resource: ResourcesEnum.SALES, action: [ActionsEnum.CREATE] }])
+  commitPaypal(@Body() commitPaypalDto: CommitPaypalDto) {
+    return this.salesService.commitPaypalTransaction(commitPaypalDto);
   }
 }

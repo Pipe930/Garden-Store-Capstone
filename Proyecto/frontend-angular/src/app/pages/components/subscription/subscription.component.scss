@@ -1,0 +1,93 @@
+@import '../../../../themes/variables.scss';
+
+.container-main{
+
+  padding: 5rem 0;
+  margin: 4rem;
+  border-radius: 10px;
+  box-shadow: 5px 5px 8px $color-dark-100;
+  background-color: $color-light;
+
+  .container__container-subcription{
+
+    .container__text{
+
+      margin-top: 5px;
+      font-size: 14px;
+    }
+  }
+
+  .container__container-main{
+
+    width: 50%;
+    margin: auto;
+
+    .container__title{
+
+      background-color: $color-success-600;
+      display: inline;
+      padding: 10px 20px;
+      border-radius: 5px;
+      color: $color-light;
+      font-weight: 900;
+    }
+
+    .container__subscribition-container{
+
+      margin: 2rem 0;
+    }
+
+    .container__list{
+
+      list-style: disc;
+
+      padding: 1rem 2rem;
+    }
+
+    .container__payment-methods{
+
+      .payment-methods__container{
+
+        margin: 1rem 0;
+        .payment-methods__type{
+
+          padding: 1rem;
+          display: block;
+          margin: 1rem 0;
+          border: 1px solid $color-dark-200;
+          border-radius: 5px;
+        }
+      }
+    }
+
+
+    .contianer__container-btn{
+
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      margin: auto;
+      width: 40%;
+
+      .container__btn-subscribe{
+
+        margin-top: 1rem;
+        padding: .6rem 1.2rem;
+        transition: background 300ms ease-in-out;
+      }
+
+      .container__btn-desubscribe{
+
+        margin-top: 1.6rem;
+        padding: .8rem 0;
+        transition: background 300ms ease-in-out;
+      }
+
+      .container__text{
+        margin-top: 5px;
+        font-size: 13px;
+      }
+    }
+
+  }
+}

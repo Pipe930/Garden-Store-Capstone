@@ -150,6 +150,36 @@ export const navbarData: Array<Sidenav> = [
       {
         routerLink: "posts/list",
         label: "Publicaciones y Etiquetas"
+      },
+      {
+        routerLink: "posts/post/create",
+        label: "Crear Publicación"
+      },
+      {
+        routerLink: "posts/tag/create",
+        label: "Crear Etiqueta"
+      }
+    ]
+  },
+  {
+    routerLink: "orders",
+    icon: "bx bxs-package",
+    label: "Pedidos",
+    items: [
+      {
+        routerLink: "orders/list",
+        label: "Lista Pedidos"
+      }
+    ]
+  },
+  {
+    routerLink: "sales",
+    icon: "bx bx-trending-up",
+    label: "Ventas",
+    items: [
+      {
+        routerLink: "sales/list",
+        label: "Lista Ventas"
       }
     ]
   }

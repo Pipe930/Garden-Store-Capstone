@@ -10,8 +10,7 @@ import { CardPostComponent } from '@shared/card-post/card-post.component';
   selector: 'app-list-posts',
   standalone: true,
   imports: [RouterLink, CardPostComponent],
-  templateUrl: './list-posts.component.html',
-  styleUrl: './list-posts.component.scss'
+  templateUrl: './list-posts.component.html'
 })
 export class ListPostsComponent implements OnInit {
 
@@ -23,13 +22,18 @@ export class ListPostsComponent implements OnInit {
 
   public isLoading = signal<boolean>(false);
   public cardsPlaceholder = signal<string[]>(new Array(4).fill(''));
-  public currentPage = signal<number>(1);
-  public totalPages = signal<number>(3);
+  public currentPage = signal<number>(0);
+  public totalPages = signal<number>(0);
   public validSession = signal<boolean>(false);
   public listTags = signal<Tag[]>([]);
   public listPosts = signal<Post[]>([]);
 
   ngOnInit(): void {
+
+    this._postService.$isLoading.subscribe((result) => {
+      this.isLoading.set(result);
+    });
+
     this.validSession.set(this._sessionService.validSession());
 
     this._postService.getAllTags().subscribe((response) => {
@@ -39,7 +43,6 @@ export class ListPostsComponent implements OnInit {
     this._postService.getAllPosts();
     this._postService.listPosts$.subscribe((response) => {
       this.listPosts.set(response);
-      this.isLoading.set(true);
       this._postService.currentPage.asObservable().subscribe((page) => {
         this.currentPage.set(page);
       });

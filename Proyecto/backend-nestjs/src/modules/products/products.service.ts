@@ -69,12 +69,13 @@ export class ProductsService {
     const offset = (page - 1) * limit;
     const products = await Product.findAll<Product>({
       include: this.includeConfigProduct(),
-      where: { published: true },
+      attributes: { exclude: ['idCategory', 'idOffer'] },
+      where: { published: true, idOffer: { [Op.is]: null } },
       limit,
       offset
     });
     
-    if(products.length === 0) return { message: "No tenemos usuarios registrados", statusCode: HttpStatus.NO_CONTENT }
+    if(products.length === 0) return { message: "No tenemos productos registrados", statusCode: HttpStatus.NO_CONTENT }
     
     const currentPage = page ? +page : 0;
     const totalPages = Math.ceil(await Product.count() / limit);
@@ -98,6 +99,7 @@ export class ProductsService {
     const offset = (page - 1) * limit;
     const products = await Product.findAll<Product>({
       include: this.includeConfigProduct(),
+      attributes: { exclude: ['idCategory', 'idOffer'] },
       limit,
       offset
     });
@@ -105,7 +107,7 @@ export class ProductsService {
     const currentPage = page ? +page : 0;
     const totalPages = Math.ceil(await Product.count() / limit);
 
-    if(products.length === 0) return { message: "No tenemos usuarios registrados", statusCode: HttpStatus.NO_CONTENT }
+    if(products.length === 0) return { message: "No tenemos productos registrados", statusCode: HttpStatus.NO_CONTENT }
 
     return {
       statusCode: HttpStatus.OK,
@@ -120,6 +122,7 @@ export class ProductsService {
 
     const product = await Product.findOne<Product>({
       where: { idProduct: id },
+      attributes: { exclude: ['idCategory', 'idOffer'] },
       include: this.includeConfigProduct()
     });
 
@@ -136,6 +139,7 @@ export class ProductsService {
 
     const product = await Product.findOne<Product>(
       { where: { slug, published: true  },
+      attributes: { exclude: ['idCategory', 'idOffer'] },
       include: this.includeConfigProduct(),
     }
     );
@@ -156,7 +160,7 @@ export class ProductsService {
       include: this.includeConfigProduct()
     });
 
-    if(products.length === 0) throw new NotFoundException("No se encontraron productos en esta categoria");
+    if(products.length === 0) return { message: "No se han encontrado productos con esa categoria", statusCode: HttpStatus.NO_CONTENT };
 
     return {
       statusCode: HttpStatus.OK,
@@ -178,6 +182,49 @@ export class ProductsService {
     if (category !== 0) whereCondition.idCategory = category;
 
     whereCondition.published = true; 
+
+    const products = await Product.findAll<Product>(
+      { where: whereCondition,
+      include: this.includeConfigProduct()
+    });
+
+    if(products.length === 0) return { message: "No se han encontrado productos", statusCode: HttpStatus.NO_CONTENT };
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: "Productos encontrados",
+      data: products
+    }
+  }
+
+  async findAllProductsOffer(): Promise<ResponseData> {
+
+    const products = await Product.findAll<Product>({
+      where: { idOffer: { [Op.not]: null } },
+      include: this.includeConfigProduct()
+    });
+
+    if(products.length === 0) return { message: "No tenemos productos con ofertas registrados", statusCode: HttpStatus.NO_CONTENT }
+
+    return {
+      statusCode: HttpStatus.OK,
+      message: "Productos encontrados",
+      data: products
+    }
+  }
+
+  async searchProductsOffer(searchProductDto: SearchProductDto): Promise<ResponseData> {
+
+    let { title, category } = searchProductDto;
+
+    if(!title) title = "";
+    if(!category) category = 0;
+
+    const whereCondition: any = {};
+
+    if (title !== "") whereCondition.title = { [Op.iLike]: `%${title}%` };
+    if (category !== 0) whereCondition.idCategory = category;
+    whereCondition.idOffer = { [Op.not]: null };
 
     const products = await Product.findAll<Product>(
       { where: whereCondition,

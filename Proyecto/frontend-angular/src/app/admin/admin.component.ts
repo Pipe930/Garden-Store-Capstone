@@ -17,6 +17,13 @@ import { HeaderComponent } from '../shared/header/header.component';
         <router-outlet/>
       </div>
     </div>
+    <footer class="sticky-footer py-4">
+      <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+              <span class="text-black-50">Copyright &copy; Garden Store 2024</span>
+          </div>
+      </div>
+    </footer>
   `,
   styles: [
     `
@@ -52,6 +59,10 @@ import { HeaderComponent } from '../shared/header/header.component';
       .body-md-screen{
         width: calc(100% - 5rem);
         margin-left: 5rem;
+      }
+
+      footer{
+        background-color: $color-light;
       }
     `
   ]

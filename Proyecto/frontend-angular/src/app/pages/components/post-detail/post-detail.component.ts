@@ -15,8 +15,7 @@ import { PostService } from '@pages/services/post.service';
   selector: 'app-post-detail',
   standalone: true,
   imports: [DatePipe, ReactiveFormsModule, NgClass, TitleCasePipe],
-  templateUrl: './post-detail.component.html',
-  styleUrl: './post-detail.component.scss'
+  templateUrl: './post-detail.component.html'
 })
 export class PostDetailComponent implements OnInit {
 
@@ -34,6 +33,7 @@ export class PostDetailComponent implements OnInit {
   public comments = signal<Comment[]>([]);
   public urlImage = signal<string>('');
   public selectedOption = signal<string | null>(null);
+  public formUpdateActivated = signal<boolean>(false);
 
   public slugPost = this._activatedRoute.snapshot.params["slug"];
 

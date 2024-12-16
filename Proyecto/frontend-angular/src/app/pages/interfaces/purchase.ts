@@ -17,7 +17,6 @@ export interface Purchase {
 }
 
 interface ProductPurchase {
-
   title: string;
   price: number;
 }
@@ -52,69 +51,11 @@ export enum TypeRetirementEnum {
   HOME_DELIVERY = 'DESPACHO A DOMICILIO'
 }
 
-export enum TypeStatusTransbankEnum {
-
-  AUTHORIZED = 'AUTHORIZED',
-  FAILED = 'FAILED'
-}
-
-export enum TypePaimentEnum {
-  DEBIT_CARD = 'debit-card',
-  CREDIT_CARD = 'credit-card',
-  MARKET_PAYMENT = 'market-payment'
-}
-
-export interface TransationTransbank {
-
-  buyOrder: string;
-  sessionId: string;
-  amount: number;
-  returnUrl: string;
-}
-
-type TypeDataTransbank = {
-  token: string;
-  url: string;
-}
-
-export interface ResponseTransbank {
-
-  status: string;
-  data: TypeDataTransbank;
-}
-
-type CardDetail = {
-
-  card_number: string;
-}
-
-export interface ConfirmTransbank {
-
-  accounting_date: string;
-  amount: number;
-  authorization_code: string;
-  buy_order: string;
-  card_detail: CardDetail;
-  installments_number: number;
-  payment_type_code: string;
-  response_code: number;
-  session_id: string;
-  status: string;
-  transaction_date: string;
-  vci: string;
-}
-
-export interface ResponseConfirmTransbank{
-
-  status: string;
-  data: ConfirmTransbank
-}
-
 export interface Voucher {
 
   address: Address;
   typePerson: string;
-  typeRetirement: string;
+  typeRetirement: TypeRetirementEnum;
   typePay: string;
   idBranch: number;
   totalPrice: number;
@@ -127,27 +68,28 @@ export interface VoucherConfirm {
   address: Address;
   typePerson: string;
   typePay: string;
-  typeRetirement: string;
+  typeRetirement: TypeRetirementEnum;
   shippingCost: number;
   idSale: number;
 }
 
-export interface Shipping {
+export interface Order {
 
   informationShipping: string;
   shippingCost: number;
-  idAddress: number;
+  withdrawal: TypeRetirementEnum;
+  idAddress?: number;
 }
 
 export interface UpdateVoucher {
 
   status: string;
-  shipping?: Shipping;
+  methodPayment: string;
+  shipping?: Order;
 }
 
 export interface CreateVoucher {
 
-  withdrawal: string;
   productsQuantity: number;
   priceTotal: number;
   discountApplied: number;
@@ -155,7 +97,7 @@ export interface CreateVoucher {
 }
 
 
-export const VoucherObject: Voucher = {
+export const voucherObject: Voucher = {
   address: {
     address: {
       idAddress: 0,
@@ -173,28 +115,10 @@ export const VoucherObject: Voucher = {
     idUser: 0
   },
   typePerson: "",
-  typeRetirement: "",
+  typeRetirement: TypeRetirementEnum.STORE_PICKUP,
   typePay: "",
   idBranch: 0,
   productsQuantity: 0,
   totalPrice: 0,
   discountApplied: 0
-}
-
-export const TransbankInfo: ConfirmTransbank = {
-
-  accounting_date: "",
-  amount: 0,
-  authorization_code: "",
-  buy_order: "",
-  card_detail: {
-    card_number: ""
-  },
-  installments_number: 0,
-  payment_type_code: "",
-  response_code: 0,
-  session_id: "",
-  status: "",
-  transaction_date: "",
-  vci: ""
 }

@@ -1,7 +1,7 @@
 import { DatePipe, DecimalPipe, NgClass, TitleCasePipe } from '@angular/common';
-import { Component, inject, Renderer2, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '@auth/services/auth.service';
 import { AlertService } from '@core/services/alert.service';
 import { SessionService } from '@core/services/session.service';
@@ -13,6 +13,7 @@ import { Purchase } from '@pages/interfaces/purchase';
 import { AddressService } from '@pages/services/address.service';
 import { ProfileService } from '@pages/services/profile.service';
 import { PurchaseService } from '@pages/services/purchase.service';
+import { catchError, EMPTY } from 'rxjs';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -35,11 +36,11 @@ export class AccountComponent {
   private readonly _purchaseService = inject(PurchaseService);
 
   public changePasswordForm: FormGroup = this._builder.group({
-    currentPassword: this._builder.control("", [Validators.required, Validators.minLength(8), Validators.maxLength(50)]),
+    oldPassword: this._builder.control("", [Validators.required, Validators.minLength(8), Validators.maxLength(50)]),
     newPassword: this._builder.control("", [Validators.required, Validators.minLength(8), Validators.maxLength(50)]),
-    reNewPassword: this._builder.control("", [Validators.required, Validators.minLength(8), Validators.maxLength(50)])
+    newRePassword: this._builder.control("", [Validators.required, Validators.minLength(8), Validators.maxLength(50)])
   }, {
-    validators: this._validatorService.comparePasswords("newPassword", "reNewPassword")
+    validators: this._validatorService.comparePasswords("newPassword", "newRePassword")
   });
 
   public deleteAccountForm: FormGroup = this._builder.group({
@@ -134,6 +135,7 @@ export class AccountComponent {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Si, eliminar",
+      cancelButtonText: "No, Cancelar"
     }).then((result) => {
       if (result.isConfirmed) {
         this._profileService.deleteAccount(this.deleteAccountForm.value).subscribe(() => {
@@ -155,6 +157,7 @@ export class AccountComponent {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Si, eliminar",
+      cancelButtonText: "No, Cancelar"
     }).then((result) => {
       if (result.isConfirmed) {
         this._addressService.deleteAddress(idAddress).subscribe(() => {
@@ -204,6 +207,7 @@ export class AccountComponent {
       this.updateFormAddress.get("name")?.setValue(result.data.name);
       this.updateFormAddress.get("addressName")?.setValue(result.data.address.addressName);
       this.updateFormAddress.get("numDepartment")?.setValue(result.data.address.numDepartment);
+      this.updateFormAddress.get("description")?.setValue(result.data.address.description);
       this.updateFormAddress.get("city")?.setValue(result.data.address.city);
       this.updateFormAddress.updateValueAndValidity();
 
@@ -362,9 +366,34 @@ export class AccountComponent {
       return;
     }
 
-    this._profileService.changePassword(this.changePasswordForm.value).subscribe(() => {
-      this._alertService.success("Cambio Contraseña", "Se cambio la contraseña correctamente");
-    })
+    Swal.fire({
+      title: "Cambiar Contraseña",
+      text: "Al cambiar tu contraseña se cerrara tu sesión actual, ¿quieres continuar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Confirmar",
+      cancelButtonText: "No, Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+
+        this._profileService.changePassword(this.changePasswordForm.value).pipe(
+          catchError(() => {
+            this._alertService.error("Cambio Contraseña", "Ocurrio un error al momento de cambiar la contraseña");
+            return EMPTY;
+          })
+        ).subscribe(() => {
+
+          this._authService.logout().subscribe(() => {
+            this._alertService.success("Cambio Contraseña", "Se cambio la contraseña correctamente");
+            this._router.navigate(['/']);
+            sessionStorage.clear();
+          });
+        });
+
+      }
+    });
 
   }
 
@@ -396,16 +425,40 @@ export class AccountComponent {
     return this.createFormAddress.controls["commune"];
   }
 
-  get currentPassword(){
-    return this.changePasswordForm.controls["currentPassword"];
+  get updateName(){
+    return this.updateFormAddress.controls["name"];
+  }
+
+  get updateAddressName(){
+    return this.updateFormAddress.controls["addressName"];
+  }
+
+  get updateCity(){
+    return this.updateFormAddress.controls["city"];
+  }
+
+  get updateFormRegion(){
+    return this.updateFormAddress.controls["region"];
+  }
+
+  get updateFormProvince(){
+    return this.updateFormAddress.controls["province"];
+  }
+
+  get updateFormCommune(){
+    return this.updateFormAddress.controls["commune"];
+  }
+
+  get oldPassword(){
+    return this.changePasswordForm.controls["oldPassword"];
   }
 
   get newPassword(){
     return this.changePasswordForm.controls["newPassword"];
   }
 
-  get reNewPassword(){
-    return this.changePasswordForm.controls["reNewPassword"];
+  get newRePassword(){
+    return this.changePasswordForm.controls["newRePassword"];
   }
 
   get firstName(){

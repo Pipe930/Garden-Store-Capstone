@@ -1,7 +1,0 @@
-{
-  "name": "GardenStore",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "angular"
-}

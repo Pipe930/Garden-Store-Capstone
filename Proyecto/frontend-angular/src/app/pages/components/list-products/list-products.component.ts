@@ -1,14 +1,16 @@
-import { Component, ElementRef, inject, OnInit, signal, Signal, viewChild } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { CardComponent } from '@shared/card/card.component';
 import { Product } from '@pages/interfaces/product';
 import { Category } from '@pages/interfaces/category';
 import { ProductsService } from '@pages/services/products.service';
 import { ViewportScroller } from '@angular/common';
+import { SearchComponent } from '@shared/search/search.component';
+import { SearchInterface } from '@core/interfaces/search';
 
 @Component({
   selector: 'app-list-products',
   standalone: true,
-  imports: [CardComponent],
+  imports: [CardComponent, SearchComponent],
   templateUrl: './list-products.component.html',
   styleUrl: './list-products.component.scss'
 })
@@ -22,10 +24,11 @@ export class ListProductsComponent implements OnInit {
   public currentPage = signal<number>(1);
   public isLoading = signal<boolean>(false);
 
-  public nameProduct: Signal<ElementRef> = viewChild.required("searchNameProduct");
-  public selectCategory: Signal<ElementRef> = viewChild.required("selectIdCategory");
-
   ngOnInit(): void {
+
+    this._productsService.$isLoading.subscribe(result => {
+      this.isLoading.set(result);
+    });
 
     this._productsService.getAllCategories().subscribe(result => {
       this.listCategories.set(result.data);
@@ -34,7 +37,6 @@ export class ListProductsComponent implements OnInit {
     this._productsService.getAllProducts();
     this._productsService.products$.subscribe(result => {
       this.listProducts.set(result);
-      this.isLoading.set(true);
     })
   }
 
@@ -52,12 +54,8 @@ export class ListProductsComponent implements OnInit {
     this._viewportScroller.scrollToPosition([0, 0]);
   }
 
-  public searchProduct():void {
-
-    const name_product = this.nameProduct().nativeElement.value;
-    const id_category = this.selectCategory().nativeElement.value;
-
-    this._productsService.searchProduct(name_product, id_category);
+  public searchProduct(objectSearch: SearchInterface):void {
+    this._productsService.searchProduct(objectSearch.nameProduct, objectSearch.idCategory);
   }
 
   get getService(){
